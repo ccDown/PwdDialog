@@ -1,0 +1,16 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+    <declare-styleable name="PwdView">
+        <attr name="frameWidth" format="dimension"></attr>
+        <attr name="frameColor" format="color"></attr>
+        <attr name="pwdBackground" format="reference"></attr>
+        <attr name="pwdCount" format="integer"></attr>
+    </declare-styleable>
+</resources>
