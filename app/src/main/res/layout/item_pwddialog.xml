@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/dialog_width"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/dialog_bg"
+    android:orientation="vertical"
+    >
+
+    <TextView
+        android:textColor="@color/black"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="25dp"
+        android:layout_marginTop="12dp"
+        android:text="请输入短信验证码"
+        android:textSize="12sp" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="25dp"
+        android:layout_marginRight="25dp"
+        android:layout_marginTop="@dimen/dialog_text_top">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:imeOptions="actionDone"
+            android:text="本次消费居民卡消费券:"
+            android:textColor="@color/black"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tv_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="2000"
+            android:textColor="@color/black"
+            android:textSize="12sp" />
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="25dp"
+        android:layout_marginRight="25dp"
+        android:layout_marginTop="@dimen/dialog_text_top">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:imeOptions="actionDone"
+            android:text="移动消费券"
+            android:textColor="@color/black"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tv_mobileticket"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="2000"
+            android:textColor="@color/oringe"
+            android:textSize="12sp" />
+
+    </RelativeLayout>
+
+    <com.seven.pwddialog.weight.PwdView
+        android:layout_marginTop="32dp"
+        android:paddingLeft="25dp"
+        android:inputType="number"
+        app:frameColor="@color/pwdBlue"
+        app:frameWidth="3dp"
+        app:pwdCount="6"
+        android:id="@+id/pwdv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        >
+
+        <Button
+            android:id="@+id/btn_cancel_dialog"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/dialog_leftbutton"
+            android:text="@string/cancel" />
+
+        <Button
+            android:id="@+id/btn_ensure_dialog"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/dialog_rightbutton"
+            android:text="@string/ensure"
+            android:textColor="@color/white" />
+    </LinearLayout>
+
+
+</LinearLayout>

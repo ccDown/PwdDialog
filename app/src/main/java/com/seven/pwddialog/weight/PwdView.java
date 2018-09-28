@@ -4,13 +4,19 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorRes;
 import android.support.annotation.Nullable;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.seven.pwddialog.R;
 
@@ -21,77 +27,130 @@ import java.util.ArrayList;
  * Created on 2018/9/27.
  * @description 密码框
  */
-public class PwdView extends View {
+public class PwdView extends android.support.v7.widget.AppCompatTextView implements TextWatcher, View.OnClickListener {
 
+    private String TAG = "PwdView";
 
-    /**输入的密码*/
-    private ArrayList pwdList = new ArrayList();
-    /**密码的个数*/
+    private Context mContext;
+    /**
+     * 输入的密码
+     */
+    private ArrayList<String> pwdList;
+    /**
+     * 密码的个数
+     */
     private int pwdCount;
-    /**密码边框颜色*/
+    /**
+     * 密码边框颜色
+     */
     @ColorRes
     private int frameColor;
-    /**密码框宽度*/
+    /**
+     * 密码框宽度
+     */
     private float frameWidth;
-    /**密码填充颜色*/
+    /**
+     * 密码填充颜色
+     */
     @ColorRes
     private int pwdColor;
-    /**密码填充图片*/
+    /**
+     * 密码填充图片
+     */
     private Drawable pwdBackground;
 
     private int size;
 
-    /**外面的圆角矩形*/
+    /**
+     * 外面的圆角矩形
+     */
     private RectF mRoundRect;
-    /**圆角矩形的圆角程度*/
+    /**
+     * 圆角矩形的圆角程度
+     */
     private int mRoundRadius;
-    /**边界画笔*/
+    /**
+     * 边框画笔
+     */
     private Paint mBorderPaint;
+    //掩盖点的画笔
+    private Paint mDotPaint;
+    //画笔颜色
+    private int mDotColor;
 
 
     public PwdView(Context context) {
         super(context);
-        initView(context,null);
+        mContext = context;
+        initView(context, null);
+        initEvent();
     }
 
     public PwdView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        initView(context,attrs);
+        mContext = context;
+        initView(context, attrs);
+        initEvent();
     }
 
     public PwdView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        initView(context,attrs);
+        mContext = context;
+        initView(context, attrs);
+        initEvent();
+
+    }
+
+    private void initEvent() {
+        setTextWatcher(textWatcher);
+        setOnClickListener(onClickListener);
     }
 
     @SuppressLint("ResourceAsColor")
     private void initView(Context context, @Nullable AttributeSet attrs) {
+
+        //隐藏光标
+        setCursorVisible(false);
+
         final float dp = getResources().getDisplayMetrics().density;
         this.setFocusable(true);
         this.setFocusableInTouchMode(true);
-        if (attrs == null){
+        if (attrs == null) {
             frameColor = context.getResources().getColor((R.color.pwdBlue));
-            frameWidth = 3;
+            frameWidth = 2;
             pwdBackground = context.getResources().getDrawable(R.drawable.ic_launcher_background);
             pwdCount = 6;
-
+            //保证文字颜色跟背景颜色一致
+            setTextColor(Color.WHITE);
+            mDotColor = Color.BLACK;
         } else {
-            TypedArray typedArray = context.obtainStyledAttributes(attrs,R.styleable.PwdView);
-            frameColor = typedArray.getColor(R.styleable.PwdView_frameColor,R.color.pwdBlue);
-            frameWidth = typedArray.getDimension(R.styleable.PwdView_frameWidth,3);
+            TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.PwdView);
+            frameColor = typedArray.getColor(R.styleable.PwdView_frameColor, R.color.pwdBlue);
+            frameWidth = typedArray.getDimension(R.styleable.PwdView_frameWidth, 3);
             pwdBackground = typedArray.getDrawable(R.styleable.PwdView_pwdBackground);
-            pwdCount = typedArray.getInt(R.styleable.PwdView_pwdCount,6);
-
+            pwdCount = typedArray.getInt(R.styleable.PwdView_pwdCount, 6);
+            setTextColor(typedArray.getColor(R.styleable.PwdView_pwdTextColor, Color.WHITE));
+            mDotColor = typedArray.getColor(R.styleable.PwdView_pwdDotColor, Color.BLACK);
             typedArray.recycle();
         }
 
-        size = (int) (dp * 30);//默认30dp一格
+        //最大输入数据长度
+        setMaxLines(pwdCount);
+
+        //默认30dp一格
+        size = (int) (dp * 42);
         mBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mBorderPaint.setStrokeWidth(frameWidth);
         mBorderPaint.setStyle(Paint.Style.STROKE);
         mBorderPaint.setColor(frameColor);
+
         mRoundRect = new RectF();
         mRoundRadius = (int) (5 * dp);
+
+        mDotPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mDotPaint.setStrokeWidth(3);
+        mDotPaint.setStyle(Paint.Style.FILL);
+        mDotPaint.setColor(mDotColor);
     }
 
     @Override
@@ -103,14 +162,17 @@ public class PwdView extends View {
         //宽度没指定,但高度指定
         if (w == -1) {
             if (h != -1) {
-                w = h * pwdCount;//宽度=高*数量
+                //宽度=高*数量
+                w = h * pwdCount;
                 size = h;
-            } else {//两个都不知道,默认宽高
+            } else {
+                //两个都不知道,默认宽高
                 w = size * pwdCount;
                 h = size;
             }
         } else {//宽度已知
-            if (h == -1) {//高度不知道
+            if (h == -1) {
+                //高度不知道
                 h = w / pwdCount;
                 size = h;
             }
@@ -148,7 +210,48 @@ public class PwdView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        
+
+        final int width = getWidth() - 2;
+        final int height = getHeight() - 2;
+        //圆角矩形
+        mRoundRect.set(0, 0, width, height);
+        canvas.drawRoundRect(mRoundRect, 0, 0, mBorderPaint);
+
+        //格子的竖线
+        mBorderPaint.setStrokeWidth(frameWidth/2);
+        for (int i = 0; i < pwdCount; i++) {
+            final int x = i * size;
+            canvas.drawLine(x, 0, x, height, mBorderPaint);
+        }
+        //圆圈
+        int dotRadius = size / 8;
+        for (int i = 0; i < pwdList.size(); i++) {
+            final float x = (float) (size * (i + 0.5));
+            final float y = size / 2;
+            canvas.drawCircle(x, y, dotRadius, mDotPaint);
+        }
+    }
+
+
+    @Override
+    protected void onFocusChanged(boolean gainFocus, int direction, Rect previouslyFocusedRect) {
+        super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
+        if (gainFocus) {
+            //调用键盘
+            showOrHideKeyBoardView(true);
+        } else {
+            //隐藏键盘
+            showOrHideKeyBoardView(false);
+        }
+    }
+
+    public void showOrHideKeyBoardView(boolean isShow) {
+        InputMethodManager inputMethodManager = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (isShow) {
+            inputMethodManager.showSoftInput(this, 0);
+        } else {
+            inputMethodManager.hideSoftInputFromWindow(getWindowToken(), 0);
+        }
     }
 
     //region  getter And setter
@@ -183,8 +286,12 @@ public class PwdView extends View {
         return this;
     }
 
-    public ArrayList getPwdList() {
-        return pwdList;
+    public String getPwd() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String s:pwdList) {
+            stringBuilder.append(s);
+        }
+        return stringBuilder.toString();
     }
 
     public Drawable getPwdBackground() {
@@ -208,5 +315,64 @@ public class PwdView extends View {
     }
 
     //endregion
+
+    //region  监听输入事件
+
+    private TextWatcher textWatcher;
+
+    public void setTextWatcher(TextWatcher textWatcher) {
+        this.textWatcher = textWatcher;
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        if (textWatcher != null) {
+            textWatcher.beforeTextChanged(s, start, count, after);
+        }
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        if (textWatcher != null) {
+            textWatcher.onTextChanged(s, start, before, count);
+        }
+
+        pwdList = new ArrayList<>();
+        for (int i = 0; i < s.length(); i++) {
+            pwdList.add(String.valueOf(s.charAt(i)));
+            invalidate();
+        }
+
+        Log.e(TAG, "input " + s.toString());
+
+        if (s.toString().length() == pwdCount) {
+            Log.e(TAG, "onTextChanged: inputDone>>>>>" + s);
+        }
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        if (textWatcher != null) {
+            textWatcher.afterTextChanged(s);
+        }
+    }
+
+    private OnClickListener onClickListener;
+
+    public void setPwdOnClickListener(OnClickListener onClickListener) {
+        this.onClickListener = onClickListener;
+    }
+
+    @Override
+    public void onClick(View v) {
+        //点击控件弹出输入键盘
+        requestFocus();
+        showOrHideKeyBoardView(true);
+        onClickListener.onClick(v);
+    }
+
+//endregion
 
 }

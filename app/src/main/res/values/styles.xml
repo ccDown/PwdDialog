@@ -12,5 +12,7 @@
         <attr name="frameColor" format="color"></attr>
         <attr name="pwdBackground" format="reference"></attr>
         <attr name="pwdCount" format="integer"></attr>
+        <attr name="pwdTextColor" format="color"></attr>
+        <attr name="pwdDotColor" format="color"></attr>
     </declare-styleable>
 </resources>
