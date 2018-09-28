@@ -5,4 +5,10 @@
     <color name="colorAccent">#FF4081</color>
 
     <color name="pwdBlue">#ACCDEC</color>
+    <color name="white">#FFFFFF</color>
+    <color name="gray">#b5b5b5</color>
+    <color name="light_gray">#A3A3A3</color>
+    <color name="black">#000000</color>
+    <color name="oringe">#FEAE2C</color>
+    <color name="deepblue" >#005569</color>
 </resources>
