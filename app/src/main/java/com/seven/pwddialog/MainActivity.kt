@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.View
 import com.seven.pwddialog.weight.PwdDialog
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -29,13 +30,13 @@ class MainActivity : AppCompatActivity() {
 
         pwdv.setPwdOnClickListener {
             Log.e("MainActivity", "MainActivity Clicked")
-            if(!isHind){
-                pwdv.showOrHideKeyBoardView(true)
-                isHind = false
-            } else {
-                pwdv.showOrHideKeyBoardView(false)
-                isHind = true
-            }
+//            if(!isHind){
+//                pwdv.showOrHideKeyBoardView(true)
+//                isHind = false
+//            } else {
+//                pwdv.showOrHideKeyBoardView(false)
+//                isHind = true
+//            }
         }
 
         button.setOnClickListener {
@@ -43,6 +44,17 @@ class MainActivity : AppCompatActivity() {
                     .PwdBuilder(this)
                     .setmAmount("2000")
                     .setmMobileTicket("20000")
+                    .setPwdClickListener(object :PwdDialog.PwdClickListener{
+                        override fun ensureClickListener(dialog: PwdDialog?, v: View?) {
+
+                        }
+
+                        override fun cancelClickListener(dialog: PwdDialog?, v: View?) {
+                            dialog!!.dismiss()
+                        }
+
+
+                    })
                     .show()
         }
     }
