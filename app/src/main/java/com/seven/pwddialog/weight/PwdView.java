@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorRes;
 import android.support.annotation.Nullable;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -120,22 +121,22 @@ public class PwdView extends android.support.v7.widget.AppCompatTextView impleme
             frameWidth = 2;
             pwdBackground = context.getResources().getDrawable(R.drawable.ic_launcher_background);
             pwdCount = 6;
-            //保证文字颜色跟背景颜色一致
-            setTextColor(Color.WHITE);
             mDotColor = Color.BLACK;
+            //设置字体颜色
+            pwdColor = Color.WHITE;
         } else {
             TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.PwdView);
             frameColor = typedArray.getColor(R.styleable.PwdView_frameColor, R.color.pwdBlue);
             frameWidth = typedArray.getDimension(R.styleable.PwdView_frameWidth, 3);
             pwdBackground = typedArray.getDrawable(R.styleable.PwdView_pwdBackground);
             pwdCount = typedArray.getInt(R.styleable.PwdView_pwdCount, 6);
-            setTextColor(typedArray.getColor(R.styleable.PwdView_pwdTextColor, Color.WHITE));
             mDotColor = typedArray.getColor(R.styleable.PwdView_pwdDotColor, Color.BLACK);
+            pwdColor = typedArray.getColor(R.styleable.PwdView_pwdTextColor,Color.WHITE);
             typedArray.recycle();
         }
 
         //最大输入数据长度
-        setMaxLines(pwdCount);
+        setFilters(new InputFilter[]{new InputFilter.LengthFilter(pwdCount)});
 
         //默认30dp一格
         size = (int) (dp * 42);
@@ -211,23 +212,29 @@ public class PwdView extends android.support.v7.widget.AppCompatTextView impleme
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        final int width = getWidth() - 2;
-        final int height = getHeight() - 2;
+        int paddingLeft = getPaddingLeft();
+        int paddingRight = getPaddingRight();
+        int paddingTop = getPaddingTop();
+        int paddingBottom = getPaddingBottom();
+
+
+        final int width = getWidth() - 2 - paddingLeft - paddingRight;
+        final int height = getHeight() - 2 - paddingTop - paddingBottom;
         //圆角矩形
-        mRoundRect.set(0, 0, width, height);
-        canvas.drawRoundRect(mRoundRect, 0, 0, mBorderPaint);
+        mRoundRect.set(paddingLeft, paddingTop, width + paddingLeft, height + paddingTop);
+        canvas.drawRoundRect(mRoundRect, mRoundRadius, mRoundRadius, mBorderPaint);
 
         //格子的竖线
-        mBorderPaint.setStrokeWidth(frameWidth/2);
-        for (int i = 0; i < pwdCount; i++) {
-            final int x = i * size;
-            canvas.drawLine(x, 0, x, height, mBorderPaint);
+        mBorderPaint.setStrokeWidth(frameWidth / 2);
+        for (int i = 1; i < pwdCount; i++) {
+            final int x = i * size + paddingLeft;
+            canvas.drawLine(x, 0, x, height + paddingTop, mBorderPaint);
         }
         //圆圈
         int dotRadius = size / 8;
         for (int i = 0; i < pwdList.size(); i++) {
-            final float x = (float) (size * (i + 0.5));
-            final float y = size / 2;
+            final float x = (float) (size * (i + 0.5)) + paddingLeft;
+            final float y = size / 2 + paddingTop;
             canvas.drawCircle(x, y, dotRadius, mDotPaint);
         }
     }
@@ -250,7 +257,7 @@ public class PwdView extends android.support.v7.widget.AppCompatTextView impleme
         if (isShow) {
             inputMethodManager.showSoftInput(this, 0);
         } else {
-            inputMethodManager.hideSoftInputFromWindow(getWindowToken(), 0);
+            inputMethodManager.hideSoftInputFromWindow(this.getWindowToken(), 0);
         }
     }
 
@@ -288,7 +295,7 @@ public class PwdView extends android.support.v7.widget.AppCompatTextView impleme
 
     public String getPwd() {
         StringBuilder stringBuilder = new StringBuilder();
-        for (String s:pwdList) {
+        for (String s : pwdList) {
             stringBuilder.append(s);
         }
         return stringBuilder.toString();

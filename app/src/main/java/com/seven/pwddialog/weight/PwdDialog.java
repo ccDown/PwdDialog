@@ -5,6 +5,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.seven.pwddialog.R;
@@ -25,6 +26,10 @@ public class PwdDialog extends Dialog {
         private View mView;
         private PwdView mPwdView;
 
+        private TextView amountTv;
+
+        private TextView ticketTv;
+
         private PwdDialog mPwdDialog;
 
         public PwdBuilder(Context context) {
@@ -35,24 +40,43 @@ public class PwdDialog extends Dialog {
                     new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT));
 
-            TextView amountTv = mView.findViewById(R.id.tv_amount);
-            TextView ticketTv = mView.findViewById(R.id.tv_mobileticket);
+            amountTv = mView.findViewById(R.id.tv_amount);
+            ticketTv = mView.findViewById(R.id.tv_mobileticket);
             mPwdView = mView.findViewById(R.id.pwdv);
             mPwdView.showOrHideKeyBoardView(true);
+
+            Button cancelBtn = mView.findViewById(R.id.btn_cancel_dialog);
+            Button ensureBtn = mView.findViewById(R.id.btn_ensure_dialog);
+
+            cancelBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    pwdClickListener.cancelClickListener(mPwdDialog,v);
+                }
+            });
+
+            ensureBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    pwdClickListener.ensureClickListener(mPwdDialog,v);
+                }
+            });
         }
 
-        public PwdBuilder show(){
+        public PwdBuilder show() {
             mPwdDialog.show();
             return this;
         }
 
         public PwdBuilder setmAmount(String mAmount) {
             this.mAmount = mAmount;
+            amountTv.setText(mAmount);
             return this;
         }
 
         public PwdBuilder setmMobileTicket(String mMobileTicket) {
             this.mMobileTicket = mMobileTicket;
+            ticketTv.setText(mMobileTicket);
             return this;
         }
 
@@ -83,10 +107,23 @@ public class PwdDialog extends Dialog {
         public String getmTitle() {
             return mTitle;
         }
+
+        private PwdClickListener pwdClickListener;
+
+        public PwdBuilder setPwdClickListener(PwdClickListener pwdClickListener) {
+            this.pwdClickListener = pwdClickListener;
+            return this;
+        }
+
     }
 
     public PwdDialog(Context context) {
         super(context);
     }
 
+    public interface PwdClickListener {
+        void cancelClickListener(PwdDialog dialog,View v);
+
+        void ensureClickListener(PwdDialog dialog,View v);
+    }
 }

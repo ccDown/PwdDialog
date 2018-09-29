@@ -13,12 +13,13 @@
         android:layout_height="wrap_content" />
 
     <com.seven.pwddialog.weight.PwdView
-        android:inputType="number"
         android:layout_centerInParent="true"
+        android:inputType="number"
         android:id="@+id/pwdv"
         app:frameColor="@color/pwdBlue"
         app:frameWidth="5dp"
-        app:pwdCount="8"
+        android:textColor="@color/white"
+        app:pwdCount="3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 </RelativeLayout>
