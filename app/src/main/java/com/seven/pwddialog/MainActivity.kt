@@ -52,10 +52,13 @@ class MainActivity : AppCompatActivity() {
                         override fun cancelClickListener(dialog: PwdDialog?, v: View?) {
                             dialog!!.dismiss()
                         }
-
-
                     })
                     .show()
         }
+
+    }
+
+    suspend fun doSomething(){
+
     }
 }

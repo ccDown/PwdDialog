@@ -16,6 +16,7 @@ import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
@@ -152,6 +153,7 @@ public class PwdView extends android.support.v7.widget.AppCompatTextView impleme
         mDotPaint.setStrokeWidth(3);
         mDotPaint.setStyle(Paint.Style.FILL);
         mDotPaint.setColor(mDotColor);
+
     }
 
     @Override
@@ -217,9 +219,8 @@ public class PwdView extends android.support.v7.widget.AppCompatTextView impleme
         int paddingTop = getPaddingTop();
         int paddingBottom = getPaddingBottom();
 
-
-        final int width = getWidth() - 2 - paddingLeft - paddingRight;
-        final int height = getHeight() - 2 - paddingTop - paddingBottom;
+        final int width = getWidth() - paddingLeft - paddingRight;
+        final int height = getHeight() - paddingTop - paddingBottom;
         //圆角矩形
         mRoundRect.set(paddingLeft, paddingTop, width + paddingLeft, height + paddingTop);
         canvas.drawRoundRect(mRoundRect, mRoundRadius, mRoundRadius, mBorderPaint);
@@ -231,10 +232,12 @@ public class PwdView extends android.support.v7.widget.AppCompatTextView impleme
             canvas.drawLine(x, 0, x, height + paddingTop, mBorderPaint);
         }
         //圆圈
+        //半径
         int dotRadius = size / 8;
         for (int i = 0; i < pwdList.size(); i++) {
-            final float x = (float) (size * (i + 0.5)) + paddingLeft;
-            final float y = size / 2 + paddingTop;
+            //在格子中间开始绘制
+            float x = (float) (size * (i + 0.5)) + paddingLeft;
+            float y = size / 2 + paddingTop;
             canvas.drawCircle(x, y, dotRadius, mDotPaint);
         }
     }
@@ -357,6 +360,17 @@ public class PwdView extends android.support.v7.widget.AppCompatTextView impleme
             Log.e(TAG, "onTextChanged: inputDone>>>>>" + s);
         }
 
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+
+        float currentX = event.getX();
+        float currentY = event.getY();
+        Log.e(TAG,"currentX>>>>>>>>"+currentX);
+        Log.e(TAG,"currentY>>>>>>>>"+currentY);
+
+        return super.onTouchEvent(event);
     }
 
     @Override
